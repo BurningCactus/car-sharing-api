@@ -20,14 +20,29 @@ MongoClient.connect(connString, { useUnifiedTopology: true })
     app.post('/reg', (req, res) => {
         const accountDetails = req.body.data;
         console.log(accountDetails);
+        accountCollection.insertOne({email: accountDetails.email, password: accountDetails.password})
+        .then(result => {
+          console.log(result);
+        });
     });
     
     app.get('/validateEmail', (req, res) => {
-        const emailToValidate = req.query;
-        console.log(emailToValidate);
-        res.send(true);
+        const emailToValidate = req.query[0];
+        accountCollection.findOne({email: emailToValidate})
+        .then(result => {
+          if(result){
+            res.send({
+              exists: false,
+              res: result
+            });
+          }else{
+            res.send({
+              exists: true,
+              res: result
+            });
+          }
+        });
     });
-
   })
   .catch(error => console.error(error));
 
